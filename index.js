@@ -1,6 +1,7 @@
 const express = require('express')
 const { dbConnection } = require('./database/config')
 require('dotenv').config()
+const cors = require('cors')
 
 //crear servidor de express
 const app = express()
@@ -8,6 +9,10 @@ const app = express()
 //base de datos
 
 dbConnection()
+
+// CORS
+
+app.use(cors()) 
 
 //directorio publico
 
@@ -26,6 +31,7 @@ app.use(express.json())
 //     })
 // })
 app.use('/api/auth', require('./routes/auth'))
+app.use('/api/events', require('./routes/events'))
 //TODO crud => eventos
 
 
