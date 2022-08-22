@@ -6,6 +6,7 @@ const DATABASE = process.env.DB_CNN
 const dbConnection = async () => {
     try {
         await mongoose.connect(DATABASE, {
+            keepAlive: true,
             useNewUrlParser: true,
             useUnifiedTopology: true,
         })
