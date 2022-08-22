@@ -38,24 +38,92 @@ const createEvent = async (req = request, res = response) => {
     }
 }
 
-const updateEvent = (req = request, res = response) => {
+const updateEvent = async (req = request, res = response) => {
     
     
+    try {
+        const { id } = req.params
+        
+        const event = await Event.findById(id)
+        const { uid } = req
 
-    return res.status(200).json({
-        ok: true,
-        msg: 'eventos | PUT'
-    })
+        if(!event) {
+            return res.status(404).json({
+                ok: false,
+                msg: 'Este evento no existe'
+            })
+        }
+
+        if(event.user.toString() != uid){
+            return res.status(401).json({
+                ok: false, 
+                msg: 'Usted no esta autorizado a realizar modificaciones a este evento'
+            })
+        }
+
+        const newEvent = {
+            ...req.body,
+            user: uid
+        }
+
+        const updatedEvent = await Event.findByIdAndUpdate(
+            id,
+            newEvent,
+            {new: true}
+        )
+
+        return res.status(200).json({
+            ok: true,
+            msg: 'Evento actualizado',
+            updatedEvent
+        })
+
+    } catch (error) {
+        console.log(error);
+
+        res.status(500).json({
+            ok: false,
+            msg: 'Hable con el administrador'
+        })
+    }
 }
 
-const deleteEvent = (req = request, res = response) => {
-    
+const deleteEvent = async (req = request, res = response) => {
+    try {
+        const { id } = req.params
+        
+        const event = await Event.findById(id)
+        const { uid } = req
 
+        if(!event) {
+            return res.status(404).json({
+                ok: false,
+                msg: 'Este evento no existe'
+            })
+        }
 
-    return res.status(200).json({
-        ok: true, 
-        msg: 'event | DELETE'
-    })
+        if(event.user.toString() != uid){
+            return res.status(401).json({
+                ok: false, 
+                msg: 'Usted no esta autorizado a realizar modificaciones a este evento'
+            })
+        }
+
+        const deletedEvent = await Event.findByIdAndDelete(id) 
+
+        return res.status(200).json({
+            ok: true,
+            msg: 'Evento eliminado',
+        })
+
+    } catch (error) {
+        console.log(error);
+
+        res.status(500).json({
+            ok: false,
+            msg: 'Hable con el administrador'
+        })
+    }
 }
 
 module.exports = {
